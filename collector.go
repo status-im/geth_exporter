@@ -4,21 +4,23 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-	"sync"
 )
 
 type collector struct {
-	cl      *client
-	fs      []*regexp.Regexp
-	ipcPath string
-	sync.Mutex
+	cl *client
+	fs []*regexp.Regexp
 }
 
-func newCollector(ipcPath string, rawFilters []string) *collector {
-	collector := &collector{ipcPath: ipcPath}
+func newCollector(ipcPath string, rawFilters []string) (*collector, error) {
+	cl, err := newClient(ipcPath)
+	if err != nil {
+		return nil, err
+	}
+
+	collector := &collector{cl: cl}
 	collector.compileFilters(rawFilters)
 
-	return collector
+	return collector, nil
 }
 
 func (c *collector) compileFilters(rawFilters []string) {
@@ -35,10 +37,6 @@ func (c *collector) compileFilters(rawFilters []string) {
 }
 
 func (c *collector) collect() (string, error) {
-	if err := c.initClient(); err != nil {
-		return "", err
-	}
-
 	m, err := c.cl.metrics()
 	if err != nil {
 		return "", err
@@ -53,21 +51,6 @@ func (c *collector) collect() (string, error) {
 	}
 
 	return all.String(), nil
-}
-
-func (c *collector) initClient() error {
-	if c.cl != nil {
-		return nil
-	}
-
-	cl, err := newClient(c.ipcPath)
-	if err != nil {
-		return err
-	}
-
-	c.cl = cl
-
-	return nil
 }
 
 func (c *collector) match(key string) bool {
