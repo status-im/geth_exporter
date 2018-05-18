@@ -14,9 +14,12 @@ lint-install:
 	go get -u github.com/alecthomas/gometalinter
 	gometalinter --install
 
-dep-install: ##@dependencies Install vendoring tool
-	go get -u github.com/golang/dep/cmd/dep
-
 test: lint
 	@echo "test"
 	@go test -v ./...
+
+dep-install: ##@dependencies Install vendoring tool
+	go get -u github.com/golang/dep/cmd/dep
+
+dep-ensure: ##@dependencies Dep ensure
+	@dep ensure
