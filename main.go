@@ -57,10 +57,7 @@ func parseFlags() {
 
 func main() {
 	parseFlags()
-	c, err := newCollector(*ipcPath, filters)
-	if err != nil {
-		log.Fatal(err)
-	}
+	c := newCollector(*ipcPath, filters)
 
 	http.HandleFunc(metricsPath, metricsHandler(c))
 	http.HandleFunc("/", rootHandler)
@@ -68,7 +65,7 @@ func main() {
 	listenAddress := fmt.Sprintf("%s:%d", *host, *port)
 
 	log.Println("Listening on", listenAddress)
-	err = http.ListenAndServe(listenAddress, nil)
+	err := http.ListenAndServe(listenAddress, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
