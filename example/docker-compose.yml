@@ -1,0 +1,18 @@
+version: '3'
+services:
+  statusd:
+    image: "statusteam/status-go"
+    volumes:
+      - ./tmp/statusd-data:/statusd-data
+    command: statusd -shh -networkid=1 -discovery=true -metrics -ipc -standalone=false -topic.search=whisper=1,4
+  geth_exporter:
+    build:
+      context: ../
+      dockerfile: _assets/Dockerfile
+    volumes:
+      - ./tmp/statusd-data:/statusd-data
+    command: geth_exporter -ipc /statusd-data/geth.ipc
+    ports:
+     - "9200:9200"
+
+
