@@ -1,6 +1,6 @@
 .DS_Store
 /build
-/example/data
+/docker-compose-example/data
 
 tags
 
