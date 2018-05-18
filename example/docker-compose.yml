@@ -5,7 +5,10 @@ services:
     volumes:
       - ./tmp/statusd-data:/statusd-data
     command: statusd -shh -networkid=1 -discovery=true -metrics -ipc -standalone=false -topic.search=whisper=1,4
+
   geth_exporter:
+    depends_on:
+      - statusd
     build:
       context: ../
       dockerfile: _assets/Dockerfile
@@ -14,5 +17,14 @@ services:
     command: geth_exporter -ipc /statusd-data/geth.ipc
     ports:
      - "9200:9200"
+
+  prometheus:
+    depends_on:
+      - geth_exporter
+    image: "prom/prometheus"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 
 
