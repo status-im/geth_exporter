@@ -1,10 +1,12 @@
 .PHONY: setup lint-install dep-install lint build
 .DEFAULT_GOAL := build
 
+DOCKER_IMAGE_NAME ?= statusteam/geth_exporter
+
 setup: dep-install lint-install ##@other Prepare project for first build
 
 build: test
-	go build
+	go build -o build/bin/geth_exporter -v .
 
 lint:
 	@echo "lint"
@@ -23,3 +25,7 @@ dep-install: ##@dependencies Install vendoring tool
 
 dep-ensure: ##@dependencies Dep ensure
 	@dep ensure
+
+docker-image:
+	@echo "Building docker image..."
+	docker build --file _assets/Dockerfile -t $(DOCKER_IMAGE_NAME):latest .
