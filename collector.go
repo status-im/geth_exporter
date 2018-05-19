@@ -7,17 +7,17 @@ import (
 )
 
 type collector struct {
-	c  *client
+	cl *client
 	fs []*regexp.Regexp
 }
 
 func newCollector(ipcPath string, rawFilters []string) (*collector, error) {
-	c, err := newClient(ipcPath)
+	cl, err := newClient(ipcPath)
 	if err != nil {
 		return nil, err
 	}
 
-	collector := &collector{c: c}
+	collector := &collector{cl: cl}
 	collector.compileFilters(rawFilters)
 
 	return collector, nil
@@ -37,7 +37,7 @@ func (c *collector) compileFilters(rawFilters []string) {
 }
 
 func (c *collector) collect() (string, error) {
-	m, err := c.c.metrics()
+	m, err := c.cl.metrics()
 	if err != nil {
 		return "", err
 	}

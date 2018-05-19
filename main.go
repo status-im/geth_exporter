@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 const (
@@ -55,9 +56,23 @@ func parseFlags() {
 	}
 }
 
+func initCollector(times int) (c *collector, err error) {
+	for i := 0; i < times; i++ {
+		c, err = newCollector(*ipcPath, filters)
+		if err == nil {
+			return c, nil
+		}
+
+		log.Println(err)
+		time.Sleep(2 * time.Second)
+	}
+
+	return nil, err
+}
+
 func main() {
 	parseFlags()
-	c, err := newCollector(*ipcPath, filters)
+	c, err := initCollector(10)
 	if err != nil {
 		log.Fatal(err)
 	}
