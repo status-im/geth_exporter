@@ -28,9 +28,9 @@ datasources:
   # <bool> enable/disable basic auth
   basicAuth: true
   # <string> basic auth username
-  basicAuthUser: admin
+  basicAuthUser:
   # <string> basic auth password
-  basicAuthPassword: foobar
+  basicAuthPassword:
   # <bool> enable/disable with credentials headers
   withCredentials:
   # <bool> mark as default datasource. Max one per org
