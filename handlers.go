@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -50,16 +49,7 @@ func writeBody(w io.Writer, body string) {
 // }
 
 func metricsHandler2(w http.ResponseWriter, r *http.Request) {
-	c := newCollector(*ipcPath, filters)
-	registry := prometheus.NewRegistry()
-	err := registry.Register(c)
-	if err != nil {
-		promlog.Errorln("Couldn't register collector:", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Sprintf("Couldn't register collector: %s", err)))
-		return
-	}
-
+	registry := newRegistry(*ipcPath)
 	gatherers := prometheus.Gatherers{
 		registry,
 	}

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	dto "github.com/prometheus/client_model/go"
 )
 
 type collector struct {
@@ -82,6 +83,12 @@ func (c *collector) Collect(ch chan<- prometheus.Metric) {
 			ch <- prometheus.MustNewConstMetric(scrapeDurationDesc, prometheus.UntypedValue, duration.Seconds(), k)
 		}
 	}
+}
+
+func (c *collector) Gather() ([]*dto.MetricFamily, error) {
+	mfs := []*dto.MetricFamily{}
+
+	return mfs, nil
 }
 
 // Describe implements the prometheus.Collector interface.
