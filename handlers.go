@@ -1,9 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	promlog "github.com/prometheus/common/log"
 )
 
 const rootHTML = `<html>
@@ -32,14 +37,41 @@ func writeBody(w io.Writer, body string) {
 	}
 }
 
-func metricsHandler(c *collector) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := c.collect()
-		if err != nil {
-			handleCollectError(w, err)
-			return
-		}
+// func metricsHandler(c *collector) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		body, err := c.collect()
+// 		if err != nil {
+// 			handleCollectError(w, err)
+// 			return
+// 		}
 
-		writeBody(w, body)
+// 		writeBody(w, body)
+// 	}
+// }
+
+func metricsHandler2(w http.ResponseWriter, r *http.Request) {
+	c := newCollector(*ipcPath, filters)
+	registry := prometheus.NewRegistry()
+	err := registry.Register(c)
+	if err != nil {
+		promlog.Errorln("Couldn't register collector:", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(fmt.Sprintf("Couldn't register collector: %s", err)))
+		return
 	}
+
+	gatherers := prometheus.Gatherers{
+		registry,
+	}
+
+	// Delegate http serving to Prometheus client library, which will call collector.Collect.
+	h := promhttp.InstrumentMetricHandler(
+		registry,
+		promhttp.HandlerFor(gatherers,
+			promhttp.HandlerOpts{
+				ErrorLog:      promlog.NewErrorLogger(),
+				ErrorHandling: promhttp.ContinueOnError,
+			}),
+	)
+	h.ServeHTTP(w, r)
 }
