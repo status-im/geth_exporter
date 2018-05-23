@@ -69,8 +69,7 @@
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "c5b7fccd204277076155f10851dad72b76a49317"
-  version = "v0.8.0"
+  revision = "c51dc758d4bb30acacbef9eaa2b774969a135086"
 
 [[projects]]
   branch = "master"
@@ -131,7 +130,7 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["websocket"]
-  revision = "2491c5de3490fced2f6cff376127c667efeed857"
+  revision = "9ef9f5bb98a1fdc41f8cf6c250a4404b4085e389"
 
 [[projects]]
   branch = "master"
@@ -165,6 +164,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "dd596a0e13f35fad6d3be7231cf3049d3d7bdbf010f8191a66d0a8c378cef3dc"
+  inputs-digest = "3fa3c971308bdc059e75d4fc59651777408b0f0a28949f4adf902f305ef6fe7d"
   solver-name = "gps-cdcl"
   solver-version = 1
