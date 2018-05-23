@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 	"regexp"
-
-	dto "github.com/prometheus/client_model/go"
 )
 
 type collector struct {
@@ -45,7 +43,7 @@ func (c *collector) collect() (flatMetrics, error) {
 	all := transformMetrics(m)
 
 	for k := range all {
-		if !c.match(k) {
+		if !c.matchAllFilters(k) {
 			delete(all, k)
 		}
 	}
@@ -53,17 +51,7 @@ func (c *collector) collect() (flatMetrics, error) {
 	return all, nil
 }
 
-func (c *collector) Gather() ([]*dto.MetricFamily, error) {
-	mfs := []*dto.MetricFamily{}
-
-	return mfs, nil
-}
-
-func (c *collector) match(key string) bool {
-	if len(c.fs) == 0 {
-		return true
-	}
-
+func (c *collector) matchAllFilters(key string) bool {
 	for _, filter := range c.fs {
 		if !filter.MatchString(key) {
 			return false

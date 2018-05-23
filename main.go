@@ -13,9 +13,9 @@ const (
 )
 
 var (
-	ipcPath = flag.String("ipc", "", "path to ipc file")
-	host    = flag.String("host", "", "http server host")
-	port    = flag.Int("port", 9200, "http server port")
+	ipcPathFlag = flag.String("ipc", "", "path to ipc file")
+	hostFlag    = flag.String("host", "", "http server host")
+	portFlag    = flag.Int("port", 9200, "http server port")
 )
 
 func usage() {
@@ -31,7 +31,7 @@ func requiredFlag(f string) {
 func parseFlags() {
 	flag.Parse()
 
-	if *ipcPath == "" {
+	if *ipcPathFlag == "" {
 		requiredFlag("ipc")
 	}
 
@@ -44,14 +44,13 @@ func parseFlags() {
 func main() {
 	parseFlags()
 
-	http.HandleFunc(metricsPath, metricsHandler)
+	http.HandleFunc(metricsPath, metricsHandler(*ipcPathFlag))
 	http.HandleFunc("/", rootHandler)
 
-	listenAddress := fmt.Sprintf("%s:%d", *host, *port)
+	listenAddress := fmt.Sprintf("%s:%d", *hostFlag, *portFlag)
 
 	log.Println("Listening on", listenAddress)
-	err := http.ListenAndServe(listenAddress, nil)
-	if err != nil {
+	if err := http.ListenAndServe(listenAddress, nil); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -25,9 +25,7 @@ func newRegistry(ipcPath string, rawFilters []string) *registry {
 }
 
 // Gather implements the prometheus.Registerer interface
-func (r *registry) Gather() ([]*dto.MetricFamily, error) {
-	var families []*dto.MetricFamily
-
+func (r *registry) Gather() (families []*dto.MetricFamily, err error) {
 	fs, err := r.Registry.Gather()
 	if err != nil {
 		log.Println(err)
@@ -38,7 +36,7 @@ func (r *registry) Gather() ([]*dto.MetricFamily, error) {
 	fm, err := r.c.collect()
 	if err != nil {
 		log.Printf("Error collecting: %+v", err)
-		return families, err
+		return
 	}
 
 	for k, v := range fm {
@@ -52,7 +50,7 @@ func (r *registry) Gather() ([]*dto.MetricFamily, error) {
 
 	}
 
-	return families, nil
+	return
 }
 
 func (r *registry) buildMetricFamily(name string, stringValue string) (*dto.MetricFamily, error) {

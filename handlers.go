@@ -30,23 +30,23 @@ func writeBody(w io.Writer, body string) {
 	}
 }
 
-func metricsHandler(w http.ResponseWriter, r *http.Request) {
-	filters := r.URL.Query()["collect[]"]
-	log.Printf("collect query: %s", filters)
+func metricsHandler(ipcPath string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		filters := r.URL.Query()["collect[]"]
+		registry := newRegistry(ipcPath, filters)
+		gatherers := prometheus.Gatherers{
+			registry,
+		}
 
-	registry := newRegistry(*ipcPath, filters)
-	gatherers := prometheus.Gatherers{
-		registry,
+		// Delegate http serving to Prometheus client library, which will call collector.Collect.
+		h := promhttp.InstrumentMetricHandler(
+			registry,
+			promhttp.HandlerFor(gatherers,
+				promhttp.HandlerOpts{
+					ErrorLog:      promlog.NewErrorLogger(),
+					ErrorHandling: promhttp.ContinueOnError,
+				}),
+		)
+		h.ServeHTTP(w, r)
 	}
-
-	// Delegate http serving to Prometheus client library, which will call collector.Collect.
-	h := promhttp.InstrumentMetricHandler(
-		registry,
-		promhttp.HandlerFor(gatherers,
-			promhttp.HandlerOpts{
-				ErrorLog:      promlog.NewErrorLogger(),
-				ErrorHandling: promhttp.ContinueOnError,
-			}),
-	)
-	h.ServeHTTP(w, r)
 }
