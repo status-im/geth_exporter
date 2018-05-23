@@ -36,19 +36,7 @@ func writeBody(w io.Writer, body string) {
 	}
 }
 
-// func metricsHandler(c *collector) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		body, err := c.collect()
-// 		if err != nil {
-// 			handleCollectError(w, err)
-// 			return
-// 		}
-
-// 		writeBody(w, body)
-// 	}
-// }
-
-func metricsHandler2(w http.ResponseWriter, r *http.Request) {
+func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	registry := newRegistry(*ipcPath)
 	gatherers := prometheus.Gatherers{
 		registry,

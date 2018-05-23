@@ -48,7 +48,7 @@ func (r *registry) Gather() ([]*dto.MetricFamily, error) {
 
 		metricFamily := &dto.MetricFamily{}
 		metricFamily.Name = proto.String(name)
-		metricFamily.Help = proto.String("test help")
+		metricFamily.Help = proto.String("metric exported from geth with debug.metrics")
 		metricFamily.Type = dto.MetricType_UNTYPED.Enum()
 		metricFamily.Metric = []*dto.Metric{m}
 

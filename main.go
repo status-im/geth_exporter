@@ -58,7 +58,7 @@ func parseFlags() {
 func main() {
 	parseFlags()
 
-	http.HandleFunc(metricsPath, metricsHandler2)
+	http.HandleFunc(metricsPath, metricsHandler)
 	http.HandleFunc("/", rootHandler)
 
 	listenAddress := fmt.Sprintf("%s:%d", *host, *port)

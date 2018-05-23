@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
 )
 
@@ -35,7 +33,6 @@ func (c *collector) compileFilters(rawFilters []string) {
 	}
 }
 
-//FIXME: remove method
 func (c *collector) collect() (flatMetrics, error) {
 	cl, err := newClient(c.ipcPath)
 	if err != nil {
@@ -58,43 +55,10 @@ func (c *collector) collect() (flatMetrics, error) {
 	return all, nil
 }
 
-var scrapeDurationDesc = prometheus.NewDesc(
-	prometheus.BuildFQName(namespace, "no_subsystem", "no_name"),
-	"geth_exporter: Metrics from geth.",
-	[]string{"collector"},
-	nil,
-)
-
-var namespace = "geth"
-
-// Collect implements the prometheus.Collector interface.
-func (c *collector) Collect(ch chan<- prometheus.Metric) {
-	m, err := c.collect()
-	if err != nil {
-		log.Printf("Error collecting: %+v", err)
-		return
-	}
-
-	begin := time.Now()
-	duration := time.Since(begin)
-
-	for k := range m {
-		if c.match(k) {
-			ch <- prometheus.MustNewConstMetric(scrapeDurationDesc, prometheus.UntypedValue, duration.Seconds(), k)
-		}
-	}
-}
-
 func (c *collector) Gather() ([]*dto.MetricFamily, error) {
 	mfs := []*dto.MetricFamily{}
 
 	return mfs, nil
-}
-
-// Describe implements the prometheus.Collector interface.
-func (c *collector) Describe(ch chan<- *prometheus.Desc) {
-	ch <- scrapeDurationDesc
-	// ch <- scrapeSuccessDesc
 }
 
 func (c *collector) match(key string) bool {
