@@ -15,7 +15,6 @@ const namespace = "geth"
 type registry struct {
 	c *collector
 	*prometheus.Registry
-	rawFilters []string
 }
 
 func newRegistry(ipcPath string, rawFilters []string) *registry {
