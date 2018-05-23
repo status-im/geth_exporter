@@ -6,26 +6,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 )
 
 const (
 	metricsPath = "/metrics"
 )
 
-type filtersFlag []string
-
-func (f *filtersFlag) String() string {
-	return strings.Join(*f, ", ")
-}
-
-func (f *filtersFlag) Set(v string) error {
-	*f = append(*f, v)
-	return nil
-}
-
 var (
-	filters filtersFlag
 	ipcPath = flag.String("ipc", "", "path to ipc file")
 	host    = flag.String("host", "", "http server host")
 	port    = flag.Int("port", 9200, "http server port")
@@ -42,7 +29,6 @@ func requiredFlag(f string) {
 }
 
 func parseFlags() {
-	flag.Var(&filters, "filter", "regular expression, can be used multiple times")
 	flag.Parse()
 
 	if *ipcPath == "" {

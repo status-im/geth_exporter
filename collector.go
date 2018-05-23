@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"regexp"
 
@@ -22,10 +21,9 @@ func newCollector(ipcPath string, rawFilters []string) *collector {
 
 func (c *collector) compileFilters(rawFilters []string) {
 	for _, raw := range rawFilters {
-		s := fmt.Sprintf("^%s", raw)
-		f, err := regexp.Compile(s)
+		f, err := regexp.Compile(raw)
 		if err != nil {
-			log.Printf("error adding filter %s, %v", s, err)
+			log.Printf("error adding filter %s, %v", raw, err)
 			continue
 		}
 
@@ -67,10 +65,10 @@ func (c *collector) match(key string) bool {
 	}
 
 	for _, filter := range c.fs {
-		if filter.MatchString(key) {
-			return true
+		if !filter.MatchString(key) {
+			return false
 		}
 	}
 
-	return false
+	return true
 }

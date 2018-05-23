@@ -12,11 +12,12 @@ import (
 type registry struct {
 	c *collector
 	*prometheus.Registry
+	rawFilters []string
 }
 
-func newRegistry(ipcPath string) *registry {
+func newRegistry(ipcPath string, rawFilters []string) *registry {
 	return &registry{
-		c:        newCollector(ipcPath, []string{}),
+		c:        newCollector(ipcPath, rawFilters),
 		Registry: prometheus.NewRegistry(),
 	}
 }

@@ -37,7 +37,10 @@ func writeBody(w io.Writer, body string) {
 }
 
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
-	registry := newRegistry(*ipcPath)
+	filters := r.URL.Query()["collect[]"]
+	log.Printf("collect query: %s", filters)
+
+	registry := newRegistry(*ipcPath, filters)
 	gatherers := prometheus.Gatherers{
 		registry,
 	}
