@@ -33,6 +33,10 @@
   name = "github.com/stretchr/testify"
   version = "1.2.1"
 
+[[constraint]]
+  name = "github.com/prometheus/client_golang"
+  revision = "c51dc758d4bb30acacbef9eaa2b774969a135086"
+
 [prune]
   go-tests = true
   unused-packages = true

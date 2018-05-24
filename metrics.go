@@ -28,7 +28,7 @@ func (fm flatMetrics) String() string {
 	return s
 }
 
-func transformMetrics(data map[string]interface{}) flatMetrics {
+func transformMetrics(data metrics) flatMetrics {
 	return flattenMetrics(data, make(flatMetrics), "")
 }
 

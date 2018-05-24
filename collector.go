@@ -1,34 +1,27 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"regexp"
 )
 
 type collector struct {
-	cl *client
-	fs []*regexp.Regexp
+	ipcPath string
+	fs      []*regexp.Regexp
 }
 
-func newCollector(ipcPath string, rawFilters []string) (*collector, error) {
-	cl, err := newClient(ipcPath)
-	if err != nil {
-		return nil, err
-	}
-
-	collector := &collector{cl: cl}
+func newCollector(ipcPath string, rawFilters []string) *collector {
+	collector := &collector{ipcPath: ipcPath}
 	collector.compileFilters(rawFilters)
 
-	return collector, nil
+	return collector
 }
 
 func (c *collector) compileFilters(rawFilters []string) {
 	for _, raw := range rawFilters {
-		s := fmt.Sprintf("^%s", raw)
-		f, err := regexp.Compile(s)
+		f, err := regexp.Compile(raw)
 		if err != nil {
-			log.Printf("error adding filter %s, %v", s, err)
+			log.Printf("error adding filter %s, %v", raw, err)
 			continue
 		}
 
@@ -36,33 +29,34 @@ func (c *collector) compileFilters(rawFilters []string) {
 	}
 }
 
-func (c *collector) collect() (string, error) {
-	m, err := c.cl.metrics()
+func (c *collector) collect() (flatMetrics, error) {
+	cl, err := newClient(c.ipcPath)
 	if err != nil {
-		return "", err
+		return nil, err
+	}
+
+	m, err := cl.metrics()
+	if err != nil {
+		return nil, err
 	}
 
 	all := transformMetrics(m)
 
 	for k := range all {
-		if !c.match(k) {
+		if !c.matchAllFilters(k) {
 			delete(all, k)
 		}
 	}
 
-	return all.String(), nil
+	return all, nil
 }
 
-func (c *collector) match(key string) bool {
-	if len(c.fs) == 0 {
-		return true
-	}
-
+func (c *collector) matchAllFilters(key string) bool {
 	for _, filter := range c.fs {
-		if filter.MatchString(key) {
-			return true
+		if !filter.MatchString(key) {
+			return false
 		}
 	}
 
-	return false
+	return true
 }

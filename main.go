@@ -6,30 +6,16 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
-	"time"
 )
 
 const (
 	metricsPath = "/metrics"
 )
 
-type filtersFlag []string
-
-func (f *filtersFlag) String() string {
-	return strings.Join(*f, ", ")
-}
-
-func (f *filtersFlag) Set(v string) error {
-	*f = append(*f, v)
-	return nil
-}
-
 var (
-	filters filtersFlag
-	ipcPath = flag.String("ipc", "", "path to ipc file")
-	host    = flag.String("host", "", "http server host")
-	port    = flag.Int("port", 9200, "http server port")
+	ipcPathFlag = flag.String("ipc", "", "path to ipc file")
+	hostFlag    = flag.String("host", "", "http server host")
+	portFlag    = flag.Int("port", 9200, "http server port")
 )
 
 func usage() {
@@ -43,10 +29,9 @@ func requiredFlag(f string) {
 }
 
 func parseFlags() {
-	flag.Var(&filters, "filter", "regular expression, can be used multiple times")
 	flag.Parse()
 
-	if *ipcPath == "" {
+	if *ipcPathFlag == "" {
 		requiredFlag("ipc")
 	}
 
@@ -56,35 +41,16 @@ func parseFlags() {
 	}
 }
 
-func initCollector(times int) (c *collector, err error) {
-	for i := 0; i < times; i++ {
-		c, err = newCollector(*ipcPath, filters)
-		if err == nil {
-			return c, nil
-		}
-
-		log.Println(err)
-		time.Sleep(2 * time.Second)
-	}
-
-	return nil, err
-}
-
 func main() {
 	parseFlags()
-	c, err := initCollector(10)
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	http.HandleFunc(metricsPath, metricsHandler(c))
+	http.HandleFunc(metricsPath, metricsHandler(*ipcPathFlag))
 	http.HandleFunc("/", rootHandler)
 
-	listenAddress := fmt.Sprintf("%s:%d", *host, *port)
+	listenAddress := fmt.Sprintf("%s:%d", *hostFlag, *portFlag)
 
 	log.Println("Listening on", listenAddress)
-	err = http.ListenAndServe(listenAddress, nil)
-	if err != nil {
+	if err := http.ListenAndServe(listenAddress, nil); err != nil {
 		log.Fatal(err)
 	}
 }
