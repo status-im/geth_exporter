@@ -24,6 +24,10 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	writeBody(w, rootHTML)
 }
 
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	writeBody(w, "OK")
+}
+
 func writeBody(w io.Writer, body string) {
 	if _, err := w.Write([]byte(body)); err != nil {
 		log.Println(err)

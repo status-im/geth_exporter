@@ -45,6 +45,7 @@ func main() {
 	parseFlags()
 
 	http.HandleFunc(metricsPath, metricsHandler(*ipcPathFlag))
+	http.HandleFunc("/health", healthHandler)
 	http.HandleFunc("/", rootHandler)
 
 	listenAddress := fmt.Sprintf("%s:%d", *hostFlag, *portFlag)
