@@ -35,6 +35,8 @@ func (c *collector) collect() (flatMetrics, error) {
 		return nil, err
 	}
 
+	defer cl.close()
+
 	m, err := cl.metrics()
 	if err != nil {
 		return nil, err

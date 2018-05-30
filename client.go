@@ -17,6 +17,10 @@ func newClient(ipcPath string) (*client, error) {
 	return &client{rpcClient}, nil
 }
 
+func (c *client) close() {
+	c.rpcClient.Close()
+}
+
 func (c *client) metrics() (metrics, error) {
 	var res metrics
 	return res, c.rpcClient.Call(&res, "debug_metrics", true)
