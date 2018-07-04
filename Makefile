@@ -11,12 +11,10 @@ build: test
 lint:
 	@echo "lint"
 	@golangci-lint run ./...
-	@find . -type f -not -path "./vendor/*" -print0 | xargs -0 misspell
 
 lint-install:
-	go get -u github.com/client9/misspell/cmd/misspell
 	@# The following installs a specific version of golangci-lint, which is appropriate for a CI server to avoid different results from build to build
-	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b $(GOPATH)/bin v1.6.1
+	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b $(GOPATH)/bin v1.9.1
 
 test: lint
 	@echo "test"
