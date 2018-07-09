@@ -28,4 +28,4 @@ dep-ensure: ##@dependencies Dep ensure
 
 docker-image:
 	@echo "Building docker image..."
-	docker build --file _assets/Dockerfile -t $(DOCKER_IMAGE_NAME):latest .
+	docker build -t $(DOCKER_IMAGE_NAME):latest .

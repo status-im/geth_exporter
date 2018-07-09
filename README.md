@@ -34,3 +34,18 @@ discv5_outboundTraffic_meanRate 2356.6951261606164
 At `http://localhost:9090/graph` you can use Prometheus to query the exporter.
 
 At `http://localhost:3000/` you can log in to grafana with username `admin` and password `admin`.
+
+## Continous Deployment
+
+To make possible deploying the new version of the page from the `develop` branch a Jenkins job is configured at:
+
+https://jenkins.status.im/job/misc/job/geth_exporter/
+
+This job is ran according to the [`Jenkinsfile`](Jenkinsfile) configuration.
+In order for this to work there are two requirements:
+
+* The `status-im-auto` user which API token is used needs to have at least write access.
+* The repo has to have the https://jenkins.status.im/github-webhook/ webhook configured.
+
+In order to push a new docker image the `statusteamauto` user on DokerHub needs to have access to:
+https://hub.docker.com/r/statusteam/geth_exporter/
