@@ -44,6 +44,15 @@ func (c *collector) collect() (flatMetrics, error) {
 
 	all := transformMetrics(m)
 
+	/* optional syncing stats */
+	s, err := cl.syncingMetrics()
+	if err == nil {
+		sync := decodeSyncData(s, "sync_")
+		for k, v := range sync {
+			all[k] = v
+		}
+	}
+
 	for k := range all {
 		if !c.matchAllFilters(k) {
 			delete(all, k)

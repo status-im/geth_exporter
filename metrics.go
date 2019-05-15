@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sort"
+	"strconv"
 	"unicode"
 	"unicode/utf8"
 )
@@ -48,6 +50,29 @@ func flattenMetrics(data metrics, memo flatMetrics, prefix string) flatMetrics {
 	}
 
 	return memo
+}
+
+func decodeSyncData(data metrics, prefix string) flatMetrics {
+	memo := make(flatMetrics)
+	for k, v := range data {
+		key := prefix + normalizeKey(k) + "_value"
+		val, ok := v.(string)
+		if !ok {
+			log.Printf("error casting to string: %s -> %v", k, v)
+		}
+		value := decodeHexAddr(val)
+		memo[key] = value
+	}
+	return memo
+}
+
+func decodeHexAddr(s string) string {
+	// Prometheus needs a number, not a hex
+	number, err := strconv.ParseUint(s, 0, 64)
+	if err != nil {
+		return "-1"
+	}
+	return fmt.Sprintf("%d", number)
 }
 
 func normalizeKey(s string) string {
