@@ -39,18 +39,22 @@ func (c *collector) collect() (flatMetrics, error) {
 
 	m, err := cl.metrics()
 	if err != nil {
-		return nil, err
+		/* not all geth nodes have debug enabled, s might be nil */
+		log.Printf("failed to get metrics: %v", err)
 	}
 
+	/* can handle m being nil, will just return an empty flatMetrics */
 	all := transformMetrics(m)
 
-	/* optional syncing stats */
 	s, err := cl.syncingMetrics()
-	if err == nil {
-		sync := decodeSyncData(s, "sync_")
-		for k, v := range sync {
-			all[k] = v
-		}
+	if err != nil {
+		/* not all geth nodes have eth enabled, s might be nil */
+		log.Printf("failed to get syncing stats: %v", err)
+	}
+
+	sync := decodeSyncData(s, "sync_")
+	for k, v := range sync {
+		all[k] = v
 	}
 
 	for k := range all {
