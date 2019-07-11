@@ -1,3 +1,5 @@
+# WARNING: This software is deprecated since Geth `1.9.0` which introduced its own [Prometheus endpoint](https://blog.ethereum.org/2019/07/10/geth-v1-9-0/#metrics-collection).
+
 # geth_exporter
 
 `geth_exporter` is a metrics exporter for [Prometheus](https://github.com/prometheus/prometheus).

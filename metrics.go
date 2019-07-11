@@ -34,6 +34,8 @@ func transformMetrics(data metrics) flatMetrics {
 	return flattenMetrics(data, make(flatMetrics), "")
 }
 
+/* flattenMetrics can handle data being nil, it will just return memo.
+ * A range over a nil slice is like a range over an empty slice. */
 func flattenMetrics(data metrics, memo flatMetrics, prefix string) flatMetrics {
 	for k, v := range data {
 		key := prefix + normalizeKey(k)
