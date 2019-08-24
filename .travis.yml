@@ -1,0 +1,13 @@
+notifications:
+  email: false
+language: go
+go:
+- 1.10.x
+sudo: false
+dist: trusty
+install: make setup
+jobs:
+  include:
+  - stage: Tests
+    script:
+      - make test
