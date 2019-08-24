@@ -11,7 +11,7 @@ services:
       - statusd
     build:
       context: ../
-      dockerfile: _assets/Dockerfile
+      dockerfile: Dockerfile
     volumes:
       - ./data/statusd-data:/statusd-data
     command: geth_exporter -ipc /statusd-data/geth.ipc
