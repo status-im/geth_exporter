@@ -6,12 +6,14 @@ import (
 )
 
 type collector struct {
-	ipcPath string
-	fs      []*regexp.Regexp
+	ipcPath    string
+	fs         []*regexp.Regexp
+	syncFails  bool
+	debugFails bool
 }
 
 func newCollector(ipcPath string, rawFilters []string) *collector {
-	collector := &collector{ipcPath: ipcPath}
+	collector := &collector{ipcPath: ipcPath, syncFails: false}
 	collector.compileFilters(rawFilters)
 
 	return collector
@@ -37,24 +39,32 @@ func (c *collector) collect() (flatMetrics, error) {
 
 	defer cl.close()
 
-	m, err := cl.metrics()
-	if err != nil {
-		/* not all geth nodes have debug enabled, s might be nil */
-		log.Printf("failed to get metrics: %v", err)
+	var all flatMetrics
+
+	if !c.debugFails {
+		m, err := cl.metrics()
+		if err != nil {
+			/* not all geth nodes have debug enabled, s might be nil */
+			log.Printf("failed to get metrics: %v", err)
+			c.debugFails = true
+		} else {
+			/* can handle m being nil, will just return an empty flatMetrics */
+			all = transformMetrics(m)
+		}
 	}
 
-	/* can handle m being nil, will just return an empty flatMetrics */
-	all := transformMetrics(m)
-
-	s, err := cl.syncingMetrics()
-	if err != nil {
-		/* not all geth nodes have eth enabled, s might be nil */
-		log.Printf("failed to get syncing stats: %v", err)
-	}
-
-	sync := decodeSyncData(s, "sync_")
-	for k, v := range sync {
-		all[k] = v
+	if !c.syncFails {
+		s, err := cl.syncingMetrics()
+		if err != nil {
+			/* not all geth nodes have eth enabled, s might be nil */
+			log.Printf("failed to get syncing stats: %v", err)
+			c.syncFails = true
+		} else {
+			sync := decodeSyncData(s, "sync_")
+			for k, v := range sync {
+				all[k] = v
+			}
+		}
 	}
 
 	for k := range all {
